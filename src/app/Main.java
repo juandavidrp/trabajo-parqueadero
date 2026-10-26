@@ -77,6 +77,30 @@ public class Main {
         return	valor;
     }
 
+    static void registrarEntrada() {
+        int celda = buscarCeldaDisponible();
+        if (celda == -1) {
+            System.out.println("El parqueadero está lleno. No hay celdas disponibles.");
+            return;
+        }
+
+        System.out.print("Ingrese el tipo de vehículo (CARRO / MOTO): ");
+        String tipo = SCANNER.nextLine().trim().toUpperCase();
+
+        if (!tipo.equals("CARRO") && !tipo.equals("MOTO")) {
+            System.out.println("Tipo de vehículo inválido.");
+            return;
+        }
+
+        LocalDateTime ingreso = leerFechaHora("Ingrese la fecha y hora de ingreso (yyyy-MM-dd HH:mm): ");
+
+        // Guardar en los arreglos
+        tiposVehiculos[celda] = tipo;
+        fechasIngreso[celda] = ingreso;
+
+        System.out.println("¡Vehículo registrado con éxito en la celda #" + (celda + 1) + "!");
+    }
+
     public static void main(String[] args) {
 
 
