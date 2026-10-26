@@ -162,6 +162,29 @@ public class Main {
         fechasIngreso[indice] = null;
         System.out.println("¡Celda liberada con éxito!\n");
     }
+    static void mostrarReporteOcupacion() {
+        int ocupadas = 0;
+        for (String t : tiposVehiculos) {
+            if (t != null) ocupadas++;
+        }
+        int libres = CAPACIDAD_TOTAL - ocupadas;
+
+        System.out.println("\n--- REPORTE DE OCUPACIÓN ---");
+        System.out.println("Celdas ocupadas: " + ocupadas);
+        System.out.println("Celdas libres:   " + libres);
+        System.out.println("----------------------------\n");
+    }
+
+    static void mostrarReporteFinanciero() {
+        int totalGeneral = recaudoCarros + recaudoMotos;
+
+        System.out.println("\n--- REPORTE FINANCIERO ---");
+        System.out.println("Recaudo de carros:  $" + recaudoCarros);
+        System.out.println("Recaudo de motos:   $" + recaudoMotos);
+        System.out.println("TOTAL RECAUDADO:    $" + totalGeneral);
+        System.out.println("--------------------------\n");
+    }
+
 
 
     public static void main(String[] args) {
