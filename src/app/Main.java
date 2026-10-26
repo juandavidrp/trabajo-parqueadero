@@ -94,14 +94,81 @@ public class Main {
 
         LocalDateTime ingreso = leerFechaHora("Ingrese la fecha y hora de ingreso (yyyy-MM-dd HH:mm): ");
 
-        // Guardar en los arreglos
+
         tiposVehiculos[celda] = tipo;
         fechasIngreso[celda] = ingreso;
 
         System.out.println("¡Vehículo registrado con éxito en la celda #" + (celda + 1) + "!");
     }
 
+    static void registrarSalida() {
+        System.out.print("Ingrese el número de celda a liberar (1 a " + CAPACIDAD_TOTAL + "): ");
+        int numeroCelda = Integer.parseInt(SCANNER.nextLine());
+        int indice = numeroCelda - 1;
+
+        if (indice < 0 || indice >= CAPACIDAD_TOTAL || tiposVehiculos[indice] == null) {
+            System.out.println("Celda inválida o se encuentra libre actualmente.");
+            return;
+        }
+
+        LocalDateTime ingreso = fechasIngreso[indice];
+        LocalDateTime salida = leerFechaHora("Ingrese la fecha y hora de salida (yyyy-MM-dd HH:mm): ");
+
+        if (salida.isBefore(ingreso)) {
+            System.out.println("Error: La fecha de salida no puede ser anterior al ingreso.");
+            return;
+        }
+
+
+        long diasACobrar = ChronoUnit.DAYS.between(ingreso, salida);
+        LocalDateTime cursor = ingreso.plusDays(diasACobrar);
+        long minutosRestantes = Duration.between(cursor, salida).toMinutes();
+        long horasACobrar = (minutosRestantes + 59) / 60;
+
+        if (horasACobrar >= UMBRAL_HORAS_DIA) {
+            diasACobrar++;
+            horasACobrar = 0;
+        }
+
+
+        String tipo = tiposVehiculos[indice];
+        int tarifaDia = tipo.equals("CARRO") ? TARIFA_DIA_CARRO : TARIFA_DIA_MOTO;
+        int tarifaHora = tipo.equals("CARRO") ? TARIFA_HORA_CARRO : TARIFA_HORA_MOTO;
+
+        int totalDiasCobro = (int) diasACobrar * tarifaDia;
+        int totalHorasCobro = (int) horasACobrar * tarifaHora;
+        int totalPagar = totalDiasCobro + totalHorasCobro;
+
+
+        System.out.println("\n========== FACTURA DE SALIDA ==========");
+        System.out.println("Celda: " + numeroCelda);
+        System.out.println("Tipo de vehículo: " + tipo);
+        System.out.println("Ingreso: " + ingreso.format(FORMATO_FECHA_HORA));
+        System.out.println("Salida:  " + salida.format(FORMATO_FECHA_HORA));
+        System.out.println("Días cobrados (" + diasACobrar + "): $" + totalDiasCobro);
+        System.out.println("Horas cobradas (" + horasACobrar + "): $" + totalHorasCobro);
+        System.out.println("TOTAL A PAGAR:       $" + totalPagar);
+        System.out.println("=======================================");
+
+
+        if (tipo.equals("CARRO")) {
+            recaudoCarros += totalPagar;
+        } else {
+            recaudoMotos += totalPagar;
+        }
+
+
+        tiposVehiculos[indice] = null;
+        fechasIngreso[indice] = null;
+        System.out.println("¡Celda liberada con éxito!\n");
+    }
+
+
     public static void main(String[] args) {
+
+
+
+
 
 
     }
