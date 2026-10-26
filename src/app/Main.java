@@ -39,30 +39,26 @@ public class Main {
             System.out.print(mensaje);
             String	texto	=	SCANNER.nextLine().trim();
             if	(!formatoFechaHoraValido(texto))	{
-                imprimir("Fecha	u	hora	inválidas.	Use	yyyy-MM-dd	HH:mm	y	el	horario	08:00-22:00.");
+                System.out.println("Fecha	u	hora	inválidas.	Use	yyyy-MM-dd	HH:mm	y	el	horario	08:00-22:00.");
                 continue;
             }
             return	LocalDateTime.parse(texto,	FORMATO_FECHA_HORA);
         }
     }
 
-    static	boolean	formatoFechaHoraValido(String	texto)	{
-        if	(texto.length()	!=	16
-                ||	texto.charAt(4)	!=	'-'
-                ||	texto.charAt(7)	!=	'-'
-                ||	texto.charAt(10)	!=	'	'
-                ||	texto.charAt(13)	!=	':')	{
-            return	false;
+    static boolean formatoFechaHoraValido(String texto) {
+        try {
+            LocalDateTime fechaHora = LocalDateTime.parse(texto, FORMATO_FECHA_HORA);
+            int hora = fechaHora.getHour();
+            int minuto = fechaHora.getMinute();
+
+            boolean horaValida = (hora > HORA_APERTURA || (hora == HORA_APERTURA && minuto >= 0)) &&
+                    (hora < HORA_CIERRE || (hora == HORA_CIERRE && minuto == 0));
+
+            return horaValida;
+        } catch (Exception e) {
+            return false;
         }
-        int	anio	=	leerDigitos(texto,	0,	4);
-        int	mes	=	leerDigitos(texto,	5,	2);
-        int	dia	=	leerDigitos(texto,	8,	2);
-        int	hora	=	leerDigitos(texto,	11,	2);
-        int	minuto	=	leerDigitos(texto,	14,	2);
-        return	anio	>=	1	&&	mes	>=	1	&&	mes	<=	12	&&	dia	>=	1	&&	dia	<=	31
-                &&	hora	>=	HORA_APERTURA	&&	hora	<=	HORA_CIERRE
-                &&	(hora	!=	HORA_CIERRE	||	minuto	<=	0)
-                &&	minuto	>=	0	&&	minuto	<=	59;
     }
 
     static	int	leerDigitos(String	texto,	int	inicio,	int	cantidad)	{
@@ -164,15 +160,23 @@ public class Main {
     }
     static void mostrarReporteOcupacion() {
         int ocupadas = 0;
-        for (String t : tiposVehiculos) {
-            if (t != null) ocupadas++;
-        }
-        int libres = CAPACIDAD_TOTAL - ocupadas;
 
-        System.out.println("\n--- REPORTE DE OCUPACIÓN ---");
-        System.out.println("Celdas ocupadas: " + ocupadas);
-        System.out.println("Celdas libres:   " + libres);
-        System.out.println("----------------------------\n");
+        System.out.println("\n--- ESTADO DETALLADO DE LAS CELDAS ---");
+        for (int i = 0; i < CAPACIDAD_TOTAL; i++) {
+            int numeroCelda = i + 1;
+            if (tiposVehiculos[i] != null) {
+                System.out.println("Celda #" + numeroCelda + ": [OCUPADA] - Vehículo: " + tiposVehiculos[i] + " (Ingreso: " + fechasIngreso[i].format(FORMATO_FECHA_HORA) + ")");
+                ocupadas++;
+            } else {
+                System.out.println("Celda #" + numeroCelda + ": [LIBRE]");
+            }
+        }
+
+        int libres = CAPACIDAD_TOTAL - ocupadas;
+        System.out.println("---------------------------------------");
+        System.out.println("Total Celdas Ocupadas: " + ocupadas);
+        System.out.println("Total Celdas Libres:   " + libres);
+        System.out.println("---------------------------------------\n");
     }
 
     static void mostrarReporteFinanciero() {
@@ -186,13 +190,44 @@ public class Main {
     }
 
 
-
     public static void main(String[] args) {
+        int opcion = 0;
+        do {
+            System.out.println("=== SISTEMA DE PARQUEADERO ===");
+            System.out.println("1. Registrar Entrada");
+            System.out.println("2. Registrar Salida y Liquidar");
+            System.out.println("3. Reporte de Ocupación");
+            System.out.println("4. Reporte Financiero");
+            System.out.println("5. Salir");
+            System.out.print("Seleccione una opción: ");
 
+            try {
+                opcion = Integer.parseInt(SCANNER.nextLine());
+                switch (opcion) {
+                    case 1:
+                        registrarEntrada();
+                        break;
+                    case 2:
+                        registrarSalida();
+                        break;
+                    case 3:
+                        mostrarReporteOcupacion();
+                        break;
+                    case 4:
+                        mostrarReporteFinanciero();
+                        break;
+                    case 5:
+                        System.out.println("Saliendo del sistema...");
+                        break;
+                    default:
+                        System.out.println("Opción inválida. Intente de nuevo.");
+                }
+            } catch (NumberFormatException e) {
+                System.out.println("Por favor, ingrese un número válido.");
+            }
+        } while (opcion != 5);
 
-
-
-
-
+        SCANNER.close();
     }
+
 }
